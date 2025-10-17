@@ -3,15 +3,35 @@
 <head>
   <meta charset="utf-8">
   <title>Live Weather Dashboard</title>
+
+  <!-- Styling for the page and table -->
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background: #eee; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #eee;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Page title -->
   <h1>Live Weather Dashboard</h1>
+
+  <!-- Table structure for displaying weather data -->
   <table id="weather">
     <thead>
       <tr>
@@ -21,10 +41,12 @@
         <th>Weather Code</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody></tbody> <!-- This will be filled dynamically with weather data -->
   </table>
-  
+
+  <!-- JavaScript to fetch and update weather data -->
   <script>
+    // List of cities with their latitude and longitude
     const cities = [
       { name: "London", lat: 51.5085, lon: -0.1257 },
       { name: "Milan", lat: 45.4643, lon: 9.1895 },
@@ -33,17 +55,22 @@
       { name: "Hyderabad", lat: 17.3841, lon: 78.4564 }
     ];
 
+    // Function to fetch and display weather data
     async function updateWeather() {
-      const tbody = document.querySelector("#weather tbody");
-      tbody.innerHTML = "";
+      const tbody = document.querySelector("#weather tbody"); // Get the table body
+      tbody.innerHTML = ""; // Clear previous data
 
+      // Loop through each city and fetch weather data
       for (const city of cities) {
+        // Open-Meteo API URL for current weather
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current_weather=true`;
 
         try {
-          const res = await fetch(url);
-          const data = await res.json();
-          const cur = data.current_weather;
+          const res = await fetch(url); // Fetch data from the API
+          const data = await res.json(); // Parse JSON response
+          const cur = data.current_weather; // Extract current weather info
+
+          // Add a new row to the table with weather data
           tbody.innerHTML += `
             <tr>
               <td>${city.name}</td>
@@ -52,13 +79,16 @@
               <td>${cur.weathercode}</td>
             </tr>`;
         } catch (e) {
+          // If there's an error, show it in the table
           tbody.innerHTML += `<tr><td>${city.name}</td><td colspan="3">Error</td></tr>`;
         }
       }
     }
 
-    updateWeather();
-    setInterval(updateWeather, 15 * 60 * 1000); // refresh every 15 minutes
+    updateWeather(); // Initial call to load data when the page opens
+
+    // Automatically update weather every 15 minutes (900,000 milliseconds)
+    setInterval(updateWeather, 15 * 60 * 1000);
   </script>
 </body>
 </html>
