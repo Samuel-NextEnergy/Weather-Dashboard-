@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -36,9 +37,10 @@
     <thead>
       <tr>
         <th>City</th>
-        <th>Temperature (°C)</th>
-        <th>Wind Speed (m/s)</th>
-        <th>Weather Code</th>
+        <th>Current Temp (°C)</th>
+        <th>High Temp (°C)</th>
+        <th>Low Temp (°C)</th>
+        <th>UV Index</th>
       </tr>
     </thead>
     <tbody></tbody> <!-- This will be filled dynamically with weather data -->
@@ -46,7 +48,6 @@
 
   <!-- JavaScript to fetch and update weather data -->
   <script>
-    // List of cities with their latitude and longitude
     const cities = [
       { name: "London", lat: 51.5085, lon: -0.1257 },
       { name: "Milan", lat: 45.4643, lon: 9.1895 },
@@ -55,39 +56,34 @@
       { name: "Hyderabad", lat: 17.3841, lon: 78.4564 }
     ];
 
-    // Function to fetch and display weather data
     async function updateWeather() {
-      const tbody = document.querySelector("#weather tbody"); // Get the table body
-      tbody.innerHTML = ""; // Clear previous data
+      const tbody = document.querySelector("#weather tbody");
+      tbody.innerHTML = "";
 
-      // Loop through each city and fetch weather data
       for (const city of cities) {
-        // Open-Meteo API URL for current weather
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current_weather=true`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,uv_index_max&timezone=auto`;
 
         try {
-          const res = await fetch(url); // Fetch data from the API
-          const data = await res.json(); // Parse JSON response
-          const cur = data.current_weather; // Extract current weather info
+          const res = await fetch(url);
+          const data = await res.json();
+          const cur = data.current_weather;
+          const daily = data.daily;
 
-          // Add a new row to the table with weather data
           tbody.innerHTML += `
             <tr>
               <td>${city.name}</td>
               <td>${cur.temperature.toFixed(1)}</td>
-              <td>${cur.windspeed.toFixed(1)}</td>
-              <td>${cur.weathercode}</td>
+              <td>${daily.temperature_2m_max[0].toFixed(1)}</td>
+              <td>${daily.temperature_2m_min[0].toFixed(1)}</td>
+              <td>${daily.uv_index_max[0].toFixed(1)}</td>
             </tr>`;
         } catch (e) {
-          // If there's an error, show it in the table
-          tbody.innerHTML += `<tr><td>${city.name}</td><td colspan="3">Error</td></tr>`;
+          tbody.innerHTML += `<tr><td>${city.name}</td><td colspan="4">Error</td></tr>`;
         }
       }
     }
 
-    updateWeather(); // Initial call to load data when the page opens
-
-    // Automatically update weather every 15 minutes (900,000 milliseconds)
+    updateWeather();
     setInterval(updateWeather, 15 * 60 * 1000);
   </script>
 </body>
